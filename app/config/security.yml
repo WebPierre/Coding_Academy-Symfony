@@ -1,0 +1,59 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/security.html
+security:
+
+    # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    providers:
+        chain_provider:
+            chain:
+                providers: [in_memory, blog_provider]
+        in_memory:
+            memory:
+              users:
+                    user:
+                        password: martin
+                        roles: 'ROLE_BLOGGER'
+                    admin:
+                        password: 1234
+                        roles: 'ROLE_ADMIN'
+        blog_provider:
+            entity:
+                class: CA\BlogBundle\Entity\User
+                property: username
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            pattern: ^/
+            http_basic: ~
+            anonymous: ~
+            provider: chain_provider
+            form_login:
+                login_path: login
+                check_path: login
+            logout:
+                path: /logout
+                target: /
+            remember_me:
+                secret:   '%secret%'
+                lifetime: 604800 # 1 week in seconds
+                path:     /
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_BLOGGER
+        ROLE_BLOGGER:     ROLE_USER
+
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+        CA\BlogBundle\Entity\User: sha512
+
+    access_control:
+      - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: /new$, roles: ROLE_BLOGGER }
+      - { path: /edit$, roles: ROLE_BLOGGER }
+      - { path: /show$, roles: ROLE_BLOGGER }
+      - { path: /delete$, roles: ROLE_ADMIN }

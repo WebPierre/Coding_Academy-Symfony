@@ -1,0 +1,11 @@
+ca_blog_user:
+    resource: "@CABlogBundle/Controller/UserController.php"
+    type:     annotation
+
+ca_blog:
+    resource: "@CABlogBundle/Resources/config/routing.yml"
+    prefix:   /
+
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
